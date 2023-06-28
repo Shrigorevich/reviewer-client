@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { IdentityError } from "../types/identity/IdentityError";
 
-export const useGetRegisterFlow = (): {
+export const useGetLoginFlow = (): {
   flow: IdentityFlow | undefined;
   loading: boolean;
   error: IdentityError | undefined;
@@ -12,7 +12,7 @@ export const useGetRegisterFlow = (): {
   const [error, setError] = useState<IdentityError | undefined>();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:4433/self-service/registration/browser", {
+    fetch("http://127.0.0.1:4433/self-service/login/browser", {
       credentials: "include",
       headers: {
         Accept: "application/json",
@@ -27,12 +27,13 @@ export const useGetRegisterFlow = (): {
           setError(data.error);
         } else {
           setFlow(data);
+          console.log(data);
         }
       })
       .catch((res) => {
         setLoading(false);
         setError(res);
-        console.log("Unhandler exception: " + res);
+        console.log(res);
       });
   }, []);
 

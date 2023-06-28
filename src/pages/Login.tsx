@@ -1,15 +1,15 @@
-import { FormEvent, useContext, useEffect, useState } from "react";
-import { useGetRegisterFlow } from "../api/useGetRegisterFlow";
+import { FormEvent, useContext, useState } from "react";
+import { useGetLoginFlow } from "../api/useGetLoginFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, Navigate } from "react-router-dom";
-import { submitRegister } from "../api/submitRegister";
-import { RegisterCredentials } from "../types/identity/RegisterCredentials";
-import { SessionResponse } from "../types/identity/SessionResponse";
+import { submitLogin } from "../api/submitLogin";
+import { LoginCredentials } from "../types/identity/LoginCredentials";
 import { Session } from "../types/identity/Session";
+import { SessionResponse } from "../types/identity/SessionResponse";
 import { AuthContext } from "../contexts/AuthContext";
 
-const Register = () => {
-  const { flow, loading, error } = useGetRegisterFlow();
+const Login = () => {
+  const { flow, loading, error } = useGetLoginFlow();
   const [response, setResponse] = useState<SessionResponse>({
     result: false,
     error: undefined,
@@ -18,7 +18,7 @@ const Register = () => {
   const { setSession } = useContext(AuthContext);
 
   interface formDataType {
-    [key: string]: string;
+    [key: string]: FormDataEntryValue;
   }
   const responseBody: formDataType = {};
 
@@ -27,28 +27,22 @@ const Register = () => {
     if (flow) {
       const formData = new FormData(event.target as HTMLFormElement);
       formData.forEach(
-        (value, property: string) => (responseBody[property] = value.toString())
+        (value, property: string) => (responseBody[property] = value)
       );
       console.log(responseBody);
-      let regCreds: RegisterCredentials = {
-        csrf_token: responseBody["csrf_token"],
-        password: responseBody["password"],
-        traits: {
-          login: responseBody["traits.login"],
-          email: responseBody["traits.email"],
-        },
-      };
 
-      submitRegister(flow.ui.action, regCreds)
+      submitLogin(flow?.ui.action, responseBody as LoginCredentials)
         .then((res) => {
           setResponse(res);
           if (res.result) {
+            console.log(res);
             setSession(res.session as Session);
           }
         })
         .catch(console.log);
     }
   };
+
   return (
     <div>
       {response.result ? <Navigate to="/" replace={true} /> : null}
@@ -64,4 +58,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;

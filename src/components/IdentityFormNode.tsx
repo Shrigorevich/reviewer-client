@@ -6,12 +6,15 @@ const IdentityFormNode = ({ node }: { node: UiNode }) => {
   }
   return (
     <div>
-      {node.meta?.label ? <label>{node.meta.label.text}</label> : null}
+      {node.meta?.label ? <label>{node.meta.label.text}</label> : null}{" "}
+      {node.attributes.required && node.attributes.type !== "hidden" ? (
+        <span> *</span>
+      ) : null}
       <br />
       <input
         name={node.attributes.name}
         type={node.attributes.type}
-        value={node.attributes.value}
+        defaultValue={node.attributes.value}
       />
     </div>
   );
