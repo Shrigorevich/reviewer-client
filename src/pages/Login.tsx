@@ -1,12 +1,12 @@
 import { FormEvent, useContext, useState } from "react";
-import { useGetLoginFlow } from "../api/useGetLoginFlow";
+import { useGetLoginFlow } from "../hooks/useGetLoginFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, Navigate } from "react-router-dom";
-import { submitLogin } from "../api/submitLogin";
 import { LoginCredentials } from "../types/identity/LoginCredentials";
 import { Session } from "../types/identity/Session";
 import { SessionResponse } from "../types/identity/SessionResponse";
 import { AuthContext } from "../contexts/AuthContext";
+import { submitLogin } from "../api/identityApi";
 
 const Login = () => {
   const { flow, loading, error } = useGetLoginFlow();

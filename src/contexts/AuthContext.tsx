@@ -1,13 +1,12 @@
-import React, {
+import {
   createContext,
   ReactNode,
-  useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { Session } from "../types/identity/Session";
 import { IdentityError } from "../types/identity/IdentityError";
+import { GetSession } from "../api/identityApi";
 
 export const AuthContext = createContext<AuthContextType>(
   {} as AuthContextType
@@ -29,21 +28,17 @@ export function AuthProvider({
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://127.0.0.1:4433/sessions/whoami", { credentials: "include" })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data);
-        } else {
-          setSession(data);
-        }
-      })
-      .catch((data) => {
-        console.log("Unhandler exception: " + data);
-        setError(data);
-      })
-      .finally(() => setLoading(false));
+    GetSession().then(res => {
+      if(res.result) {
+        setSession(res.session as Session)
+      } else if(res.error) {
+        setError(res.error as IdentityError)
+      }
+    })
+    .finally(() => setLoading(false))
   }, []);
+
+  //TODO: Investigate React.memo usability
 
   return (
     <AuthContext.Provider value={{ session, setSession }}>

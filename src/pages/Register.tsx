@@ -1,19 +1,17 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
-import { useGetRegisterFlow } from "../api/useGetRegisterFlow";
+import { useGetRegisterFlow } from "../hooks/useGetRegisterFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, Navigate } from "react-router-dom";
-import { submitRegister } from "../api/submitRegister";
 import { RegisterCredentials } from "../types/identity/RegisterCredentials";
 import { SessionResponse } from "../types/identity/SessionResponse";
 import { Session } from "../types/identity/Session";
 import { AuthContext } from "../contexts/AuthContext";
+import { submitRegister } from "../api/identityApi";
 
 const Register = () => {
   const { flow, loading, error } = useGetRegisterFlow();
   const [response, setResponse] = useState<SessionResponse>({
-    result: false,
-    error: undefined,
-    session: undefined,
+    result: false
   });
   const { setSession } = useContext(AuthContext);
 
