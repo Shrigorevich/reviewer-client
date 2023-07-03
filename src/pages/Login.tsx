@@ -1,5 +1,5 @@
 import { FormEvent, useContext, useState } from "react";
-import { useGetLoginFlow } from "../hooks/useGetLoginFlow";
+import { useLoginFlow } from "../hooks/useLoginFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, Navigate } from "react-router-dom";
 import { LoginCredentials } from "../types/identity/LoginCredentials";
@@ -9,7 +9,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { submitLogin } from "../api/identityApi";
 
 const Login = () => {
-  const { flow, loading, error } = useGetLoginFlow();
+  const { flow, loading, error } = useLoginFlow();
   const [response, setResponse] = useState<SessionResponse>({
     result: false,
     error: undefined,
@@ -29,13 +29,11 @@ const Login = () => {
       formData.forEach(
         (value, property: string) => (responseBody[property] = value)
       );
-      console.log(responseBody);
 
       submitLogin(flow?.ui.action, responseBody as LoginCredentials)
         .then((res) => {
           setResponse(res);
           if (res.result) {
-            console.log(res);
             setSession(res.session as Session);
           }
         })
@@ -50,7 +48,10 @@ const Login = () => {
       {loading ? (
         <>loading</>
       ) : !error && flow ? (
-        <IdentityForm flow={flow} submitHandler={submitHandler} />
+        <div>
+          <IdentityForm flow={flow} submitHandler={submitHandler} />
+          <Link to="/recovery">Forget password?</Link>
+        </div>
       ) : (
         <>Server error</>
       )}

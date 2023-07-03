@@ -1,10 +1,12 @@
 import { GetFlowResponse } from "../types/identity/GetFlowResponse";
+import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { LoginCredentials } from "../types/identity/LoginCredentials";
 import { LogoutFlow } from "../types/identity/LogoutFlow";
+import { RecoveryCredentials } from "../types/identity/RecoveryCredentials";
 import { RegisterCredentials } from "../types/identity/RegisterCredentials";
 import { SessionResponse } from "../types/identity/SessionResponse";
 
-const baseUrl = "/.ory";
+const baseUrl = "http://localhost:4000";
 
 export const GetSession = async (): Promise<SessionResponse> => {
   try {
@@ -17,7 +19,7 @@ export const GetSession = async (): Promise<SessionResponse> => {
       result: response.ok,
     } as SessionResponse;
 
-    response.ok ? (result.session = payload.session) : (result.error = payload); //TODO: remove payload.session
+    response.ok ? (result.session = payload) : (result.error = payload);
     return result;
   } catch (exception) {
     return {
@@ -36,7 +38,7 @@ export const GetLoginFlow = async (): Promise<GetFlowResponse> => {
     });
 
     const payload = await response.json();
-    console.log("Payload: " + payload);
+    console.log(payload);
 
     let result: GetFlowResponse = {
       result: response.ok,
@@ -64,6 +66,30 @@ export const GetRegisterFlow = async (): Promise<GetFlowResponse> => {
 
     const payload = await response.json();
     console.log("Payload: " + payload);
+
+    let result: GetFlowResponse = {
+      result: response.ok,
+    };
+    response.ok ? (result.flow = payload) : (result.error = payload);
+    return result;
+  } catch (exception) {
+    return {
+      result: false,
+    };
+  }
+};
+
+export const GetRecoveryFlow = async (): Promise<GetFlowResponse> => {
+  try {
+    const response = await fetch(`${baseUrl}/self-service/recovery/browser`, {
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const payload = await response.json();
+    console.log(payload);
 
     let result: GetFlowResponse = {
       result: response.ok,
@@ -130,31 +156,52 @@ export const submitRegister = async (
   return result;
 };
 
-export const logout = async (): Promise<boolean> => {
+export const submitRecoveryStart = async (
+  url: string,
+  credentials: RecoveryCredentials
+): Promise<GetFlowResponse> => {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      Accept: "text/*",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      method: "code",
+      ...credentials,
+    }),
+  });
+
+  const payload = await response.json();
+  console.log(payload);
+
+  let result: GetFlowResponse = {
+    result: response.ok,
+  };
+  response.ok ? (result.flow = payload) : (result.error = payload);
+  return result;
+};
+
+export const Logout = async (): Promise<boolean> => {
   try {
-    const flow: LogoutFlow = await getLogoutFlow();
-    return await submitLogout(flow);
+    const logoutFlowResponse = await fetch(
+      `${baseUrl}/self-service/logout/browser`,
+      {
+        credentials: "include",
+      }
+    );
+    const flow: LogoutFlow = await logoutFlowResponse.json();
+    const response = await fetch(flow.logout_url, {
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    return response.ok;
   } catch (exception) {
     console.log("Unhandled exception: " + exception);
     return false;
   }
-};
-
-const getLogoutFlow = async (): Promise<LogoutFlow> => {
-  const response = await fetch(`${baseUrl}/self-service/logout/browser`, {
-    credentials: "include",
-  });
-  const result = await response.json();
-  return result as LogoutFlow;
-};
-
-const submitLogout = async (flow: LogoutFlow): Promise<boolean> => {
-  const response = await fetch(flow.logout_url, {
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  return response.ok;
 };

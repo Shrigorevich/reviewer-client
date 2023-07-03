@@ -1,5 +1,5 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
-import { useGetRegisterFlow } from "../hooks/useGetRegisterFlow";
+import { useRegisterFlow } from "../hooks/useRegisterFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, Navigate } from "react-router-dom";
 import { RegisterCredentials } from "../types/identity/RegisterCredentials";
@@ -9,9 +9,9 @@ import { AuthContext } from "../contexts/AuthContext";
 import { submitRegister } from "../api/identityApi";
 
 const Register = () => {
-  const { flow, loading, error } = useGetRegisterFlow();
+  const { flow, loading, error } = useRegisterFlow();
   const [response, setResponse] = useState<SessionResponse>({
-    result: false
+    result: false,
   });
   const { setSession } = useContext(AuthContext);
 

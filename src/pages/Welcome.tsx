@@ -1,13 +1,12 @@
-import { useContext, useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { logout } from "../api/logout";
-import { Session } from "../types/identity/Session";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+import { Logout } from "../api/identityApi";
 
 const Welcome = () => {
   const { session } = useContext(AuthContext);
   const logoutHandler = () => {
-    logout().then((isLoggedOut) => {
+    Logout().then((isLoggedOut) => {
       if (isLoggedOut) window.location.reload();
     });
   };
@@ -21,7 +20,7 @@ const Welcome = () => {
         <div>
           <Link to="/register">Register</Link>
           <br />
-          <Link to="/login">Login</Link>
+          <Link to="/.ory/login">Login</Link>
         </div>
       )}
     </div>

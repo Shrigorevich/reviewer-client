@@ -3,7 +3,7 @@ import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { IdentityError } from "../types/identity/IdentityError";
 import { GetLoginFlow } from "../api/identityApi";
 
-export const useGetLoginFlow = (): {
+export const useLoginFlow = (): {
   flow?: IdentityFlow;
   loading: boolean;
   error?: IdentityError;
@@ -13,12 +13,11 @@ export const useGetLoginFlow = (): {
   const [error, setError] = useState<IdentityError>();
 
   useEffect(() => {
-    setLoading(true)
     GetLoginFlow()
-      .then(res => {
-        if(res.result) {
-          setFlow(res.flow)
-        } else if(res.error) {
+      .then((res) => {
+        if (res.result) {
+          setFlow(res.flow);
+        } else if (res.error) {
           setError(res.error);
         }
       })
