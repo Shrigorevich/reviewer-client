@@ -1,18 +1,11 @@
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent } from "react";
 import IdentityForm from "../components/IdentityForm";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
 import { useRecoveryFlow } from "../hooks/useRecoveryFlow";
-import { RecoveryCredentials } from "../types/identity/RecoveryCredentials";
-import { GetFlowResponse } from "../types/identity/GetFlowResponse";
-import { submitRecoveryStart } from "../api/identityApi";
-import { IdentityFlow } from "../types/identity/IdentityFlow";
+import { submitRecovery } from "../api/identityApi";
 
 const Recovery = () => {
   const { flow, loading, error } = useRecoveryFlow();
-  const [response, setResponse] = useState<GetFlowResponse>({
-    result: false,
-  });
 
   interface formDataType {
     [key: string]: FormDataEntryValue;
@@ -21,44 +14,24 @@ const Recovery = () => {
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (flow) {
-      const formData = new FormData(event.target as HTMLFormElement);
-      formData.forEach(
-        (value, property: string) => (responseBody[property] = value)
-      );
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-      submitRecoveryStart(flow?.ui.action, responseBody as RecoveryCredentials)
-        .then((res) => {
-          setResponse(res);
-          console.log(res);
-        })
-        .catch(console.log);
-    }
+    submitRecovery(flow?.ui.action as string, formData);
   };
 
-  if (response.result) {
-    return (
-      <div>
-        <IdentityForm
-          flow={response.flow as IdentityFlow}
-          submitHandler={submitHandler}
-        />
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <Link to="/">Home</Link>
-        {loading ? (
-          <>loading</>
-        ) : !error && flow ? (
-          <IdentityForm flow={flow} submitHandler={submitHandler} />
-        ) : (
-          <>Server error</>
-        )}
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Link to="/">Home</Link>
+      {loading ? (
+        <>loading</>
+      ) : !error && flow ? (
+        <IdentityForm flow={flow} submitHandler={submitHandler} />
+      ) : (
+        <>Server error</>
+      )}
+    </div>
+  );
 };
 
 export default Recovery;

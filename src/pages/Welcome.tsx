@@ -20,7 +20,7 @@ const Welcome = () => {
         <div>
           <Link to="/register">Register</Link>
           <br />
-          <Link to="/.ory/login">Login</Link>
+          <Link to="/login">Login</Link>
         </div>
       )}
     </div>

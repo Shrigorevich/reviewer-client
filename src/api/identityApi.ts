@@ -79,14 +79,17 @@ export const GetRegisterFlow = async (): Promise<GetFlowResponse> => {
   }
 };
 
-export const GetRecoveryFlow = async (): Promise<GetFlowResponse> => {
+export const GetRecoveryFlow = async (id: string): Promise<GetFlowResponse> => {
   try {
-    const response = await fetch(`${baseUrl}/self-service/recovery/browser`, {
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    const response = await fetch(
+      `${baseUrl}/self-service/recovery/flows?id=${id}`,
+      {
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
 
     const payload = await response.json();
     console.log(payload);
@@ -156,21 +159,18 @@ export const submitRegister = async (
   return result;
 };
 
-export const submitRecoveryStart = async (
+export const submitRecovery = async (
   url: string,
-  credentials: RecoveryCredentials
+  formData: FormData
 ): Promise<GetFlowResponse> => {
   const response = await fetch(url, {
     method: "POST",
     credentials: "include",
     headers: {
-      Accept: "text/*",
-      "Content-Type": "application/json",
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     },
-    body: JSON.stringify({
-      method: "code",
-      ...credentials,
-    }),
+    body: formData,
   });
 
   const payload = await response.json();

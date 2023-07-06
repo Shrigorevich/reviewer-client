@@ -2,11 +2,22 @@ import { FormEvent, useContext, useState } from "react";
 import { useLoginFlow } from "../hooks/useLoginFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, Navigate } from "react-router-dom";
-import { LoginCredentials } from "../types/identity/LoginCredentials";
-import { Session } from "../types/identity/Session";
 import { SessionResponse } from "../types/identity/SessionResponse";
 import { AuthContext } from "../contexts/AuthContext";
-import { submitLogin } from "../api/identityApi";
+import {
+  Configuration,
+  FrontendApi,
+  UpdateRecoveryFlowBody,
+} from "@ory/client";
+
+const frontend = new FrontendApi(
+  new Configuration({
+    basePath: "http://localhost:4000", // Use your local Ory Tunnel URL
+    baseOptions: {
+      withCredentials: true, // we need to include cookies
+    },
+  })
+);
 
 const Login = () => {
   const { flow, loading, error } = useLoginFlow();
@@ -29,15 +40,23 @@ const Login = () => {
       formData.forEach(
         (value, property: string) => (responseBody[property] = value)
       );
+      let body = Object.fromEntries(
+        formData
+      ) as unknown as UpdateRecoveryFlowBody;
+      body.method = "code";
 
-      submitLogin(flow?.ui.action, responseBody as LoginCredentials)
-        .then((res) => {
-          setResponse(res);
-          if (res.result) {
-            setSession(res.session as Session);
-          }
-        })
-        .catch(console.log);
+      frontend.updateRecoveryFlow({
+        flow: flow.id,
+        updateRecoveryFlowBody: body,
+      });
+      // submitLogin(flow?.ui.action, responseBody as LoginCredentials)
+      //   .then((res) => {
+      //     setResponse(res);
+      //     if (res.result) {
+      //       setSession(res.session as Session);
+      //     }
+      //   })
+      //   .catch(console.log);
     }
   };
 
@@ -50,7 +69,9 @@ const Login = () => {
       ) : !error && flow ? (
         <div>
           <IdentityForm flow={flow} submitHandler={submitHandler} />
-          <Link to="/recovery">Forget password?</Link>
+          <a href="http://localhost:4000/self-service/recovery/browser">
+            Forget password?
+          </a>
         </div>
       ) : (
         <>Server error</>

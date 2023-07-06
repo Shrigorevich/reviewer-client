@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { IdentityError } from "../types/identity/IdentityError";
-import { GetRecoveryFlow } from "../api/identityApi";
+import { GetRegisterFlow } from "../api/identityApi";
 
 export const useRegisterFlow = (): {
   flow?: IdentityFlow;
@@ -13,7 +13,7 @@ export const useRegisterFlow = (): {
   const [error, setError] = useState<IdentityError>();
 
   useEffect(() => {
-    GetRecoveryFlow()
+    GetRegisterFlow()
       .then((res) => {
         if (res.result) {
           setFlow(res.flow);
