@@ -11,8 +11,8 @@ const IdentityForm = ({
 }) => {
   return (
     <form onSubmit={submitHandler}>
-      {flow.ui.nodes.map((node, i) => (
-        <IdentityFormNode node={node} key={i} />
+      {flow.ui.nodes.map((node, key) => (
+        <IdentityFormNode node={node} key={key} />
       ))}
     </form>
   );

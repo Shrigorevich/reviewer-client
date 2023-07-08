@@ -1,8 +1,6 @@
 import { GetFlowResponse } from "../types/identity/GetFlowResponse";
-import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { LoginCredentials } from "../types/identity/LoginCredentials";
 import { LogoutFlow } from "../types/identity/LogoutFlow";
-import { RecoveryCredentials } from "../types/identity/RecoveryCredentials";
 import { RegisterCredentials } from "../types/identity/RegisterCredentials";
 import { SessionResponse } from "../types/identity/SessionResponse";
 
