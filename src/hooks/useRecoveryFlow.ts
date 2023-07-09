@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { IdentityError } from "../types/identity/IdentityError";
-import { GetLoginFlow, GetRecoveryFlow } from "../api/identityApi";
+import { CreateLoginFlow, GetRecoveryFlow } from "../api/identityApi";
 import { useSearchParams } from "react-router-dom";
 
 export const useRecoveryFlow = (): {

@@ -1,19 +1,14 @@
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent, useContext } from "react";
 import { useLoginFlow } from "../hooks/useLoginFlow";
 import IdentityForm from "../components/IdentityForm";
 import { Link, useNavigate } from "react-router-dom";
-import { SessionResponse } from "../types/identity/SessionResponse";
 import { AuthContext } from "../contexts/AuthContext";
 import { submitLogin } from "../api/identityApi";
 import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
-import { Session } from "../types/identity/Session";
 
 const Login = () => {
-  const { flow, loading, error } = useLoginFlow();
+  const { flow, setFlow, loading, error } = useLoginFlow();
   const navigate = useNavigate();
-  const [response, setResponse] = useState<SessionResponse>({
-    result: false,
-  });
   const { setSession } = useContext(AuthContext);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
@@ -22,24 +17,20 @@ const Login = () => {
       const form = event.currentTarget;
       const formData = new FormData(form);
 
-      // map the entire form data to JSON for the request body
       let body = Object.fromEntries(
         formData
       ) as unknown as LoginWithPasswordMethod;
       body.method = "password";
-      console.log(body);
 
       submitLogin(flow?.ui.action, body)
         .then((res) => {
-          console.log("Result" + res.result);
-          if (res.result) {
-            setSession(res.session as Session);
-            navigate("/");
-          } else {
-            setResponse(res);
-          }
+          setSession(res.data.session);
+          navigate("/");
         })
-        .catch(console.log);
+        .catch((err) => {
+          console.log("login error: " + err);
+          setFlow(err.response.data);
+        });
     }
   };
 

@@ -18,9 +18,11 @@ const Welcome = () => {
         <button onClick={logoutHandler}>Log Out</button>
       ) : (
         <div>
-          <Link to="/register">Register</Link>
+          <a href="http://localhost:4000/self-service/registration/browser">
+            Register
+          </a>
           <br />
-          <Link to="/login">Login</Link>
+          <a href="http://localhost:4000/self-service/login/browser">Login</a>
         </div>
       )}
     </div>
