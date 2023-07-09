@@ -18,7 +18,6 @@ export const useLoginFlow = () => {
     const flowId = search.get("flow");
 
     if (flowId) {
-      console.log("GET LOGIN FLOW");
       GetLoginFlow(flowId)
         .then((res) => {
           setFlow(res.data);

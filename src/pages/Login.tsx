@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { submitLogin } from "../api/identityApi";
 import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
+import { AxiosError } from "axios";
+import { IdentityFlow } from "../types/identity/IdentityFlow";
 
 const Login = () => {
   const { flow, setFlow, loading, error } = useLoginFlow();
@@ -22,14 +24,14 @@ const Login = () => {
       ) as unknown as LoginWithPasswordMethod;
       body.method = "password";
 
-      submitLogin(flow?.ui.action, body)
+      submitLogin(flow?.id, body)
         .then((res) => {
           setSession(res.data.session);
           navigate("/");
         })
-        .catch((err) => {
+        .catch((err: AxiosError<IdentityFlow>) => {
           console.log("login error: " + err);
-          setFlow(err.response.data);
+          setFlow(err.response?.data);
         });
     }
   };

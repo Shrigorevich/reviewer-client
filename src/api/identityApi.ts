@@ -1,17 +1,21 @@
 import { GetFlowResponse } from "../types/identity/GetFlowResponse";
 import { LogoutFlow } from "../types/identity/LogoutFlow";
-import { RegisterCredentials } from "../types/identity/RegisterCredentials";
-import { SessionResponse } from "../types/identity/SessionResponse";
 import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
 import { SignInSuccess } from "../types/identity/SignInSuccess";
 import axios, { AxiosResponse } from "axios";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
+import { UpdateRegistrationFlowWithPasswordMethod } from "@ory/client";
+import { RegisterWithPasswordMethod } from "../types/identity/RegisterWithPasswordMethod";
+import { SessionResponse } from "../types/identity/SessionResponse";
 
 const baseUrl = "http://localhost:4000";
 
 const api = axios.create({
   baseURL: "http://localhost:4000",
   withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
 });
 
 export const GetSession = async (): Promise<SessionResponse> => {
@@ -38,11 +42,7 @@ export const GetLoginFlow = async (
   id: string
 ): Promise<AxiosResponse<IdentityFlow>> => {
   try {
-    return await api.get<IdentityFlow>(`/self-service/login/flows?id=${id}`, {
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    return await api.get<IdentityFlow>(`/self-service/login/flows?id=${id}`);
   } catch (exception) {
     return Promise.reject(exception);
   }
@@ -52,40 +52,31 @@ export const CreateLoginFlow = async (): Promise<
   AxiosResponse<IdentityFlow>
 > => {
   try {
-    return await api.get<IdentityFlow>("/self-service/login/browser", {
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    return await api.get<IdentityFlow>("/self-service/login/browser");
   } catch (exception) {
     return Promise.reject(exception);
   }
 };
 
-export const GetRegisterFlow = async (): Promise<GetFlowResponse> => {
+export const GetRegisterFlow = async (
+  id: string
+): Promise<AxiosResponse<IdentityFlow>> => {
   try {
-    const response = await fetch(
-      `${baseUrl}/self-service/registration/browser`,
-      {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      }
+    return await api.get<IdentityFlow>(
+      `/self-service/registration/flows?id=${id}`
     );
-
-    const payload = await response.json();
-    console.log("Payload: " + payload);
-
-    let result: GetFlowResponse = {
-      result: response.ok,
-    };
-    response.ok ? (result.flow = payload) : (result.error = payload);
-    return result;
   } catch (exception) {
-    return {
-      result: false,
-    };
+    return Promise.reject(exception);
+  }
+};
+
+export const CreateRegisterFlow = async (): Promise<
+  AxiosResponse<IdentityFlow>
+> => {
+  try {
+    return await api.get<IdentityFlow>("/self-service/registration/browser");
+  } catch (exception) {
+    return Promise.reject(exception);
   }
 };
 
@@ -117,46 +108,45 @@ export const GetRecoveryFlow = async (id: string): Promise<GetFlowResponse> => {
 };
 
 export const submitLogin = async (
-  url: string,
+  flowId: string,
   body: LoginWithPasswordMethod
 ): Promise<AxiosResponse<SignInSuccess>> => {
   try {
-    return await axios.post<SignInSuccess>(url, body, {
-      withCredentials: true,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
+    return await api.post<SignInSuccess>(
+      `/self-service/login?flow=${flowId}`,
+      body,
+      {
+        withCredentials: true,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (exception) {
     return Promise.reject(exception);
   }
 };
 
 export const submitRegister = async (
-  url: string,
-  credentials: RegisterCredentials
-): Promise<SessionResponse> => {
-  const response = await fetch(url, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      method: "password",
-      ...credentials,
-    }),
-  });
-
-  const payload = await response.json();
-  console.log(payload);
-  const result = {
-    result: response.ok,
-  } as SessionResponse;
-
-  response.ok ? (result.session = payload.session) : (result.error = payload); //TODO: remove payload.session
-  return result;
+  flowId: string,
+  body: RegisterWithPasswordMethod
+): Promise<AxiosResponse<SignInSuccess>> => {
+  try {
+    return await api.post<SignInSuccess>(
+      `/self-service/registration?flow=${flowId}`,
+      body,
+      {
+        withCredentials: true,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (exception) {
+    return Promise.reject(exception);
+  }
 };
 
 export const submitRecovery = async (

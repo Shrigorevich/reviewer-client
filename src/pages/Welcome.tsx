@@ -19,7 +19,7 @@ const Welcome = () => {
       ) : (
         <div>
           <a href="http://localhost:4000/self-service/registration/browser">
-            Register
+            Sign On
           </a>
           <br />
           <a href="http://localhost:4000/self-service/login/browser">Login</a>

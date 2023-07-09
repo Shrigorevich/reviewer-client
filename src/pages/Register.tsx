@@ -1,60 +1,52 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
 import { useRegisterFlow } from "../hooks/useRegisterFlow";
 import IdentityForm from "../components/IdentityForm";
-import { Link, Navigate } from "react-router-dom";
-import { RegisterCredentials } from "../types/identity/RegisterCredentials";
-import { SessionResponse } from "../types/identity/SessionResponse";
-import { Session } from "../types/identity/Session";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { submitRegister } from "../api/identityApi";
+import { RegisterWithPasswordMethod } from "../types/identity/RegisterWithPasswordMethod";
+import { AxiosError } from "axios";
+import { IdentityFlow } from "../types/identity/IdentityFlow";
 
 const Register = () => {
-  const { flow, loading, error } = useRegisterFlow();
-  const [response, setResponse] = useState<SessionResponse>({
-    result: false,
-  });
+  const { flow, setFlow, loading, error } = useRegisterFlow();
+  const navigate = useNavigate();
   const { setSession } = useContext(AuthContext);
-
-  interface formDataType {
-    [key: string]: string;
-  }
-  const responseBody: formDataType = {};
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (flow) {
-      const formData = new FormData(event.target as HTMLFormElement);
-      formData.forEach(
-        (value, property: string) => (responseBody[property] = value.toString())
-      );
-      console.log(responseBody);
-      let regCreds: RegisterCredentials = {
-        csrf_token: responseBody["csrf_token"],
-        password: responseBody["password"],
-        traits: {
-          login: responseBody["traits.login"],
-          email: responseBody["traits.email"],
-        },
-      };
+      const form = event.currentTarget;
+      const formData = new FormData(form);
 
-      submitRegister(flow.ui.action, regCreds)
+      let body = Object.fromEntries(
+        formData
+      ) as unknown as RegisterWithPasswordMethod;
+      body.method = "password";
+
+      submitRegister(flow?.id, body)
         .then((res) => {
-          setResponse(res);
-          if (res.result) {
-            setSession(res.session as Session);
-          }
+          setSession(res.data.session);
+          navigate("/");
         })
-        .catch(console.log);
+        .catch((err: AxiosError<IdentityFlow>) => {
+          console.log(err.toJSON());
+        });
     }
   };
+
   return (
     <div>
-      {response.result ? <Navigate to="/" replace={true} /> : null}
       <Link to="/">Home</Link>
       {loading ? (
         <>loading</>
       ) : !error && flow ? (
-        <IdentityForm flow={flow} submitHandler={submitHandler} />
+        <div>
+          <IdentityForm flow={flow} submitHandler={submitHandler} />
+          <a href="http://localhost:4000/self-service/recovery/browser">
+            Forget password?
+          </a>
+        </div>
       ) : (
         <>Server error</>
       )}

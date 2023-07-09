@@ -18,13 +18,16 @@ const IdentityFormNode = ({ node }: { node: UiNode }) => {
       );
     default:
       return (
-        <input
-          name={attrs.name}
-          type={attrs.type}
-          defaultValue={attrs.value}
-          required={attrs.required}
-          disabled={attrs.disabled}
-        />
+        <div>
+          <p>{node.meta?.label?.text}</p>
+          <input
+            name={attrs.name}
+            type={attrs.type}
+            defaultValue={attrs.value}
+            required={attrs.required}
+            disabled={attrs.disabled}
+          />
+        </div>
       );
   }
 };
