@@ -1,8 +1,8 @@
 import { GetFlowResponse } from "../types/identity/GetFlowResponse";
-import { LoginCredentials } from "../types/identity/LoginCredentials";
 import { LogoutFlow } from "../types/identity/LogoutFlow";
 import { RegisterCredentials } from "../types/identity/RegisterCredentials";
 import { SessionResponse } from "../types/identity/SessionResponse";
+import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
 
 const baseUrl = "http://localhost:4000";
 
@@ -106,7 +106,7 @@ export const GetRecoveryFlow = async (id: string): Promise<GetFlowResponse> => {
 
 export const submitLogin = async (
   url: string,
-  credentials: LoginCredentials
+  body: LoginWithPasswordMethod
 ): Promise<SessionResponse> => {
   const response = await fetch(url, {
     method: "POST",
@@ -115,10 +115,7 @@ export const submitLogin = async (
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      ...credentials,
-      method: "password",
-    }),
+    body: JSON.stringify(body),
   });
 
   const payload = await response.json();

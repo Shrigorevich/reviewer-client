@@ -1,40 +1,40 @@
 import { FormEvent, useContext, useState } from "react";
 import { useLoginFlow } from "../hooks/useLoginFlow";
 import IdentityForm from "../components/IdentityForm";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SessionResponse } from "../types/identity/SessionResponse";
 import { AuthContext } from "../contexts/AuthContext";
 import { submitLogin } from "../api/identityApi";
-import { LoginCredentials } from "../types/identity/LoginCredentials";
+import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
 import { Session } from "../types/identity/Session";
 
 const Login = () => {
   const { flow, loading, error } = useLoginFlow();
   const navigate = useNavigate();
   const [response, setResponse] = useState<SessionResponse>({
-    result: false
+    result: false,
   });
   const { setSession } = useContext(AuthContext);
-
-  interface formDataType {
-    [key: string]: FormDataEntryValue;
-  }
-  const responseBody: formDataType = {};
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (flow) {
-      const formData = new FormData(event.target as HTMLFormElement);
-      formData.forEach(
-        (value, property: string) => (responseBody[property] = value)
-      );
-      
-      submitLogin(flow?.ui.action, responseBody as LoginCredentials)
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+
+      // map the entire form data to JSON for the request body
+      let body = Object.fromEntries(
+        formData
+      ) as unknown as LoginWithPasswordMethod;
+      body.method = "password";
+      console.log(body);
+
+      submitLogin(flow?.ui.action, body)
         .then((res) => {
-          console.log("Result" + res.result)
-          if(res.result) {
+          console.log("Result" + res.result);
+          if (res.result) {
             setSession(res.session as Session);
-            navigate("/")
+            navigate("/");
           } else {
             setResponse(res);
           }
