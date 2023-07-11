@@ -1,45 +1,47 @@
 import { useEffect, useState } from "react";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { IdentityError } from "../types/identity/IdentityError";
-import { CreateLoginFlow, GetRecoveryFlow } from "../api/identityApi";
+import {
+  CreateLoginFlow,
+  CreateRecoveryFlow,
+  GetRecoveryFlow,
+} from "../api/identityApi";
 import { useSearchParams } from "react-router-dom";
+import { URLSearchParams } from "url";
 
-export const useRecoveryFlow = (): {
-  flow?: IdentityFlow;
-  loading: boolean;
-  error?: IdentityError;
-} => {
+export const useRecoveryFlow = () => {
   const [flow, setFlow] = useState<IdentityFlow>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<IdentityError>();
-  const [searchParams] = useSearchParams();
+  const [search, setParam] = useSearchParams();
 
   useEffect(() => {
-    const flowId = searchParams.get("flow");
-    if (flowId && flowId.trim() !== "") {
+    const flowId = search.get("flow");
+
+    if (flowId) {
       GetRecoveryFlow(flowId)
         .then((res) => {
-          if (res.result) {
-            setFlow(res.flow);
-          } else if (res.error) {
-            setError(res.error);
-          }
+          console.log(res.data);
+          setFlow(res.data);
+        })
+        .catch((err) => {
+          console.log("Get recovery error: " + err);
+          setError(err.response.data);
         })
         .finally(() => setLoading(false));
     } else {
-      setLoading(false);
-      //TODO: need refactoring
-      setError({
-        error: {
-          message: "No flowId",
-          code: 0,
-          id: "",
-          reason: "",
-          status: "",
-        },
-      });
+      CreateRecoveryFlow()
+        .then((res) => {
+          setParam(`flow=${res.data.id}`, { replace: true });
+          setFlow(res.data);
+        })
+        .catch((err) => {
+          console.log("Create recovery error: " + err);
+          setError(err.response.data);
+        })
+        .finally(() => setLoading(false));
     }
   }, []);
 
-  return { flow, loading, error };
+  return { flow, setFlow, loading, error };
 };

@@ -20,6 +20,7 @@ export const useLoginFlow = () => {
     if (flowId) {
       GetLoginFlow(flowId)
         .then((res) => {
+          console.log(res.data);
           setFlow(res.data);
         })
         .catch((err) => {

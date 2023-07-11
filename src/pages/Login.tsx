@@ -12,6 +12,7 @@ const Login = () => {
   const { flow, setFlow, loading, error } = useLoginFlow();
   const navigate = useNavigate();
   const { setSession } = useContext(AuthContext);
+  // const { flow: flowId, return_to: returnTo } = router.query
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -7,6 +7,7 @@ import { IdentityFlow } from "../types/identity/IdentityFlow";
 import { UpdateRegistrationFlowWithPasswordMethod } from "@ory/client";
 import { RegisterWithPasswordMethod } from "../types/identity/RegisterWithPasswordMethod";
 import { SessionResponse } from "../types/identity/SessionResponse";
+import { RecoverWithCodeMethod } from "../types/identity/RecoveryWithCodeMethod";
 
 const baseUrl = "http://localhost:4000";
 
@@ -80,30 +81,23 @@ export const CreateRegisterFlow = async (): Promise<
   }
 };
 
-export const GetRecoveryFlow = async (id: string): Promise<GetFlowResponse> => {
+export const GetRecoveryFlow = async (
+  id: string
+): Promise<AxiosResponse<IdentityFlow>> => {
   try {
-    const response = await fetch(
-      `${baseUrl}/self-service/recovery/flows?id=${id}`,
-      {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      }
-    );
-
-    const payload = await response.json();
-    console.log(payload);
-
-    let result: GetFlowResponse = {
-      result: response.ok,
-    };
-    response.ok ? (result.flow = payload) : (result.error = payload);
-    return result;
+    return await api.get<IdentityFlow>(`/self-service/recovery/flows?id=${id}`);
   } catch (exception) {
-    return {
-      result: false,
-    };
+    return Promise.reject(exception);
+  }
+};
+
+export const CreateRecoveryFlow = async (): Promise<
+  AxiosResponse<IdentityFlow>
+> => {
+  try {
+    return await api.get<IdentityFlow>("/self-service/recovery/browser");
+  } catch (exception) {
+    return Promise.reject(exception);
   }
 };
 
@@ -150,27 +144,17 @@ export const submitRegister = async (
 };
 
 export const submitRecovery = async (
-  url: string,
-  formData: FormData
-): Promise<GetFlowResponse> => {
-  const response = await fetch(url, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    },
-    body: formData,
-  });
-
-  const payload = await response.json();
-  console.log(payload);
-
-  let result: GetFlowResponse = {
-    result: response.ok,
-  };
-  response.ok ? (result.flow = payload) : (result.error = payload);
-  return result;
+  flowId: string,
+  body: RecoverWithCodeMethod
+): Promise<AxiosResponse<IdentityFlow>> => {
+  try {
+    return await api.post<IdentityFlow>(
+      `/self-service/recovery?flow=${flowId}`,
+      body
+    );
+  } catch (exception) {
+    return Promise.reject(exception);
+  }
 };
 
 export const Logout = async (): Promise<boolean> => {
