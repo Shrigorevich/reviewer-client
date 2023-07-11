@@ -1,6 +1,6 @@
 import { FormEvent, useContext } from "react";
 import { useLoginFlow } from "../hooks/useLoginFlow";
-import IdentityForm from "../components/IdentityForm";
+import IdentityForm from "../components/IdentityForm/IdentityForm";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { submitLogin } from "../api/identityApi";

@@ -1,17 +1,21 @@
-import { FormEvent, useContext, useEffect, useState } from "react";
-import { useRegisterFlow } from "../hooks/useRegisterFlow";
+import { FormEvent, useContext, useEffect } from "react";
 import IdentityForm from "../components/IdentityForm/IdentityForm";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { submitRegister } from "../api/identityApi";
-import { RegisterWithPasswordMethod } from "../types/identity/RegisterWithPasswordMethod";
+import { Link } from "react-router-dom";
+import { submitLogin, submitPasswordSettings } from "../api/identityApi";
+import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
 import { AxiosError } from "axios";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
+import { useSettingsFlow } from "../hooks/useSettingsFlow";
+import { ChangePasswordSettings } from "../types/identity/ChangePasswordSettings";
+import { AuthContext } from "../contexts/AuthContext";
 
-const Register = () => {
-  const { flow, setFlow, loading, error } = useRegisterFlow();
-  const navigate = useNavigate();
-  const { setSession } = useContext(AuthContext);
+const Settings = () => {
+  const { flow, setFlow, loading, error } = useSettingsFlow();
+  const { updateSession } = useContext(AuthContext);
+
+  useEffect(() => {
+    updateSession();
+  }, []);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -21,16 +25,16 @@ const Register = () => {
 
       let body = Object.fromEntries(
         formData
-      ) as unknown as RegisterWithPasswordMethod;
+      ) as unknown as ChangePasswordSettings;
       body.method = "password";
 
-      submitRegister(flow?.id, body)
+      submitPasswordSettings(flow?.id, body)
         .then((res) => {
-          setSession(res.data.session);
-          navigate("/");
+          console.log(res.data);
         })
         .catch((err: AxiosError<IdentityFlow>) => {
-          console.log(err.toJSON());
+          console.log("login error: " + err);
+          setFlow(err.response?.data);
         });
     }
   };
@@ -54,4 +58,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Settings;

@@ -1,13 +1,12 @@
-import { GetFlowResponse } from "../types/identity/GetFlowResponse";
 import { LogoutFlow } from "../types/identity/LogoutFlow";
 import { LoginWithPasswordMethod } from "../types/identity/LoginWithPasswordMethod";
 import { SignInSuccess } from "../types/identity/SignInSuccess";
 import axios, { AxiosResponse } from "axios";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
-import { UpdateRegistrationFlowWithPasswordMethod } from "@ory/client";
 import { RegisterWithPasswordMethod } from "../types/identity/RegisterWithPasswordMethod";
 import { SessionResponse } from "../types/identity/SessionResponse";
 import { RecoverWithCodeMethod } from "../types/identity/RecoveryWithCodeMethod";
+import { ChangePasswordSettings } from "../types/identity/ChangePasswordSettings";
 
 const baseUrl = "http://localhost:4000";
 
@@ -45,7 +44,7 @@ export const GetLoginFlow = async (
   try {
     return await api.get<IdentityFlow>(`/self-service/login/flows?id=${id}`);
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -55,7 +54,7 @@ export const CreateLoginFlow = async (): Promise<
   try {
     return await api.get<IdentityFlow>("/self-service/login/browser");
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -67,7 +66,7 @@ export const GetRegisterFlow = async (
       `/self-service/registration/flows?id=${id}`
     );
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -77,7 +76,7 @@ export const CreateRegisterFlow = async (): Promise<
   try {
     return await api.get<IdentityFlow>("/self-service/registration/browser");
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -87,7 +86,7 @@ export const GetRecoveryFlow = async (
   try {
     return await api.get<IdentityFlow>(`/self-service/recovery/flows?id=${id}`);
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -97,7 +96,27 @@ export const CreateRecoveryFlow = async (): Promise<
   try {
     return await api.get<IdentityFlow>("/self-service/recovery/browser");
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
+  }
+};
+
+export const GetSettingsFlow = async (
+  id: string
+): Promise<AxiosResponse<IdentityFlow>> => {
+  try {
+    return await api.get<IdentityFlow>(`/self-service/settings/flows?id=${id}`);
+  } catch (exception) {
+    throw exception;
+  }
+};
+
+export const CreateSettingsFlow = async (): Promise<
+  AxiosResponse<IdentityFlow>
+> => {
+  try {
+    return await api.get<IdentityFlow>("/self-service/settings/browser");
+  } catch (exception) {
+    throw exception;
   }
 };
 
@@ -108,17 +127,10 @@ export const submitLogin = async (
   try {
     return await api.post<SignInSuccess>(
       `/self-service/login?flow=${flowId}`,
-      body,
-      {
-        withCredentials: true,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
+      body
     );
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -129,17 +141,10 @@ export const submitRegister = async (
   try {
     return await api.post<SignInSuccess>(
       `/self-service/registration?flow=${flowId}`,
-      body,
-      {
-        withCredentials: true,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
+      body
     );
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
   }
 };
 
@@ -153,7 +158,21 @@ export const submitRecovery = async (
       body
     );
   } catch (exception) {
-    return Promise.reject(exception);
+    throw exception;
+  }
+};
+
+export const submitPasswordSettings = async (
+  flowId: string,
+  body: ChangePasswordSettings
+): Promise<AxiosResponse<IdentityFlow>> => {
+  try {
+    return await api.post<IdentityFlow>(
+      `/self-service/settings?flow=${flowId}`,
+      body
+    );
+  } catch (exception) {
+    throw exception;
   }
 };
 

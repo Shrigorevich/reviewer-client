@@ -1,11 +1,12 @@
 import { FormEvent } from "react";
-import IdentityForm from "../components/IdentityForm";
+import IdentityForm from "../components/IdentityForm/IdentityForm";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoveryFlow } from "../hooks/useRecoveryFlow";
 import { submitRecovery } from "../api/identityApi";
 import { RecoverWithCodeMethod } from "../types/identity/RecoveryWithCodeMethod";
 import { AxiosError } from "axios";
 import { IdentityFlow } from "../types/identity/IdentityFlow";
+import { RedirectError } from "../types/identity/RedirectError";
 
 const Recovery = () => {
   const { flow, setFlow, loading, error } = useRecoveryFlow();
@@ -26,9 +27,14 @@ const Recovery = () => {
           console.log(res);
           setFlow(res.data);
         })
-        .catch((err: AxiosError<IdentityFlow>) => {
-          console.log("login error: " + err);
-          setFlow(err.response?.data);
+        .catch((err: AxiosError) => {
+          console.log(err);
+          if (err.request.status === 422) {
+            navigate((err.response?.data as RedirectError).redirect_browser_to);
+          } else {
+            console.log("login error: " + err);
+            setFlow(err.response?.data as IdentityFlow);
+          }
         });
     }
   };

@@ -1,6 +1,7 @@
 import { FormEvent } from "react";
-import { IdentityFlow } from "../types/identity/IdentityFlow";
-import IdentityFormNode from "./IdentityFormNode";
+import { IdentityFlow } from "../../types/identity/IdentityFlow";
+import IdentityFormNode from "../IdentityFormNode";
+import styles from "./IdentityForm.module.css";
 
 const IdentityForm = ({
   flow,
@@ -11,6 +12,7 @@ const IdentityForm = ({
 }) => {
   return (
     <form
+      className={styles.identityForm}
       action={flow.ui.action}
       method={flow.ui.method}
       onSubmit={submitHandler}

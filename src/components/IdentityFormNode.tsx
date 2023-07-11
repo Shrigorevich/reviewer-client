@@ -1,4 +1,5 @@
 import { UiNode } from "../types/identity/UiNode";
+import { Button, Input } from "@mui/material";
 
 const IdentityFormNode = ({ node }: { node: UiNode }) => {
   const attrs = node.attributes;
@@ -8,19 +9,19 @@ const IdentityFormNode = ({ node }: { node: UiNode }) => {
     case "button":
     case "submit":
       return (
-        <button
+        <Button
           type={attrs.type as "submit" | "reset" | "button" | undefined}
           name={attrs.name}
           value={attrs.value}
         >
           {node.meta.label.text}
-        </button>
+        </Button>
       );
     default:
       return (
         <div>
           <p>{node.meta?.label?.text}</p>
-          <input
+          <Input
             name={attrs.name}
             type={attrs.type}
             defaultValue={attrs.value}
